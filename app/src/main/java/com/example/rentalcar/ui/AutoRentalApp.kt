@@ -1,8 +1,10 @@
 package com.example.rentalcar.ui
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,25 +27,33 @@ fun AutoRentalApp(
     val context = LocalContext.current
     var currentScreen by remember { mutableStateOf("main") }
 
-    BackHandler(enabled = currentScreen == "auth" || currentScreen == "register") {
-        currentScreen = "main"
+    LaunchedEffect(viewModel.isAuthenticated, viewModel.error) {
+        if (viewModel.isAuthenticated) {
+            when (currentScreen) {
+                "auth", "register" -> currentScreen = "main"
+            }
+        }
+    }
+
+    BackHandler(enabled = currentScreen == "auth" || currentScreen == "register" || currentScreen == "profile" || currentScreen == "rental") {
+        when (currentScreen) {
+            "auth" -> currentScreen = "main"
+            "register" -> currentScreen = "auth"
+            "profile" -> currentScreen = "main"
+            "rental" -> currentScreen = "profile"
+            else -> currentScreen = "main"
+        }
     }
 
     Column(modifier = modifier) {
         when (currentScreen) {
             "auth" -> AuthScreen(
-                onLogin = { email, password ->
-                    viewModel.login(email, password)
-                    if (viewModel.isAuthenticated) currentScreen = "main"
-                },
+                viewModel = viewModel,
                 onNavigateToRegister = { currentScreen = "register" }
             )
 
             "register" -> RegisterScreen(
-                onRegister = { user ->
-                    viewModel.register(user)
-                    currentScreen = "main"
-                },
+                viewModel = viewModel,
                 onBack = { currentScreen = "auth" }
             )
 
@@ -55,7 +65,8 @@ fun AutoRentalApp(
                     } else {
                         currentScreen = "auth"
                     }
-                },                onNavigateToLogin = { currentScreen = "auth" },
+                },
+                onNavigateToLogin = { currentScreen = "auth" },
                 onNavigateToRegister = { currentScreen = "register" },
                 onCarClick = { carId -> viewModel.toggleCarExpanded(carId) }
             )
@@ -74,10 +85,10 @@ fun AutoRentalApp(
                 viewModel = viewModel,
                 onBack = { currentScreen = "profile" },
                 onSubmitted = {
-                    android.widget.Toast.makeText(
+                    Toast.makeText(
                         context,
                         "Ваша заявка принята на рассмотрение",
-                        android.widget.Toast.LENGTH_SHORT
+                        Toast.LENGTH_SHORT
                     ).show()
                     currentScreen = "main"
                 }

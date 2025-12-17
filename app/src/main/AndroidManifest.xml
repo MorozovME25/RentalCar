@@ -2,7 +2,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
+        android:name=".data.base.RentalCarApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -10,7 +22,19 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.RentalCar">
+        android:theme="@style/Theme.RentalCar"
+        tools:ignore="ExtraText">
+        android:enableOnBackInvokedCallback="true"
+
+        <meta-data
+            android:name="com.google.firebase.appid"
+            android:value="1:123456789012:android:abcdef1234567890abcdef12" />
+
+        <!-- Firebase API Key -->
+        <meta-data
+            android:name="com.google.firebase.api_key"
+            android:value="AIzaSyAbcdef1234567890Abcdef1234567890ab" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

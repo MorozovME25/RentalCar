@@ -1,5 +1,8 @@
 package com.example.rentalcar.ui.screens
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.rentalcar.data.TestData
 import com.example.rentalcar.data.models.Contract
@@ -44,11 +48,19 @@ fun RentalRequestScreen(
 ) {
     val user = viewModel.currentUser ?: return
 
+    var passportImageUri by remember { mutableStateOf<Uri?>(null) }
+
     var priceRange by remember { mutableStateOf("Бюджет") }
     var childSeat by remember { mutableStateOf(false) }
     var date by remember { mutableStateOf("") }
     var time by remember { mutableStateOf("") }
     var consent by remember { mutableStateOf(false) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        passportImageUri = uri
+    }
 
     Column(
         modifier = Modifier
@@ -60,8 +72,12 @@ fun RentalRequestScreen(
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(value = user.phone, onValueChange = {}, enabled = false, label = { Text("Телефон") })
         Spacer(modifier = Modifier.height(8.dp))
-        Button(onClick = {}) { Text("Прикрепить паспорт") }
-        Spacer(modifier = Modifier.height(8.dp))
+        Button(onClick = {
+            launcher.launch("image/*")
+        }) {
+            Text("Прикрепить паспорт")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
 
         DropdownMenuExample(priceRange) { priceRange = it }
         Spacer(modifier = Modifier.height(8.dp))
@@ -90,6 +106,7 @@ fun RentalRequestScreen(
                     id = (TestData.contracts.size + 1).toString(),
                     userId = user.id,
                     startDateMillis = System.currentTimeMillis(),
+                    passportImageUri = passportImageUri?.toString(),
                     endDateMillis = null,
                     totalPrice = 0.0,
                     details = emptyList(),

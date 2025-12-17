@@ -20,13 +20,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.rentalcar.data.models.User
+import com.example.rentalcar.ui.viewmodel.AppViewModel
 
 @Composable
 fun RegisterScreen(
-    onRegister: (User) -> Unit,
+    viewModel: AppViewModel,
     onBack: () -> Unit
 ) {
     var fullName by remember { mutableStateOf("") }
@@ -42,6 +44,14 @@ fun RegisterScreen(
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
+        if (viewModel.error != null) {
+            Text(
+                text = viewModel.error!!,
+                color = Color.Red,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+        }
+
         OutlinedTextField(value = fullName, onValueChange = { fullName = it }, label = { Text("ФИО") })
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
@@ -63,11 +73,11 @@ fun RegisterScreen(
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(
-            enabled = consent,
+            enabled = consent && !viewModel.isLoading,
             onClick = {
-                onRegister(
+                viewModel.register(
                     User(
-                        id = email,
+                        id = "", // Будет сгенерирован Firebase
                         fullName = fullName,
                         email = email,
                         phone = phone,
@@ -78,7 +88,11 @@ fun RegisterScreen(
                 )
             }
         ) {
-            Text("Зарегистрироваться")
+            if (viewModel.isLoading) {
+                Text("Регистрация...")
+            } else {
+                Text("Зарегистрироваться")
+            }
         }
         TextButton(onClick = onBack) {
             Text("Назад")

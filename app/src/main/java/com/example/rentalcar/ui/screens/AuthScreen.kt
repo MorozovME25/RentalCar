@@ -18,12 +18,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.rentalcar.ui.viewmodel.AppViewModel
 
 @Composable
 fun AuthScreen(
-    onLogin: (String, String) -> Unit,
+    viewModel: AppViewModel,
     onNavigateToRegister: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
@@ -36,6 +38,14 @@ fun AuthScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        if (viewModel.error != null) {
+            Text(
+                text = viewModel.error!!,
+                color = Color.Red,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+        }
+
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -51,8 +61,15 @@ fun AuthScreen(
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { onLogin(email, password) }) {
-            Text("Войти")
+        Button(
+            onClick = { viewModel.login(email, password) },
+            enabled = !viewModel.isLoading
+        ) {
+            if (viewModel.isLoading) {
+                Text("Загрузка...")
+            } else {
+                Text("Войти")
+            }
         }
         TextButton(onClick = onNavigateToRegister) {
             Text("Регистрация")

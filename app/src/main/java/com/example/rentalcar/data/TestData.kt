@@ -7,7 +7,7 @@ import com.example.rentalcar.data.models.TransmissionType
 import com.example.rentalcar.data.models.User
 
 object TestData {
-    val cars = listOf(
+    var cars = listOf(
         Car("1", "BMW", "X5", 2022, TransmissionType.AUTOMATIC, true, 7000, CarStatus.AVAILABLE),
         Car("2", "Toyota", "Camry", 2020, TransmissionType.AUTOMATIC, true, 4000, CarStatus.OCCUPIED),
         Car("3", "Lada", "Granta", 2019, TransmissionType.MANUAL, false, 2000, CarStatus.AVAILABLE),
